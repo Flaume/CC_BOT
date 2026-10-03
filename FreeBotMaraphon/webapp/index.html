@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#151619">
+<title>C&C Админ</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{--bg:#151619;--s1:#1d1f23;--s2:#282a30;--ln:#33363c;--tx:#f3f3f4;--mu:#8d9097;--inv:#151619;--lf:none;color-scheme:dark}
+[data-theme=light]{--bg:#f3f3f4;--s1:#fff;--s2:#ebebed;--ln:#dcdde0;--tx:#151619;--mu:#6d7077;--inv:#fff;--lf:invert(1);color-scheme:light}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 -apple-system,"Segoe UI",Roboto,Inter,sans-serif;padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+header{position:sticky;top:0;z-index:5;display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--ln)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:650}
+.logo{width:26px;height:26px;filter:var(--lf)}
+.ic{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+button{font:inherit;color:inherit;cursor:pointer;transition:opacity .2s,transform .15s}
+button:active{transform:scale(.96)}
+.icon-btn{width:38px;height:38px;border-radius:50%;border:1px solid var(--ln);background:var(--s1);display:grid;place-items:center}
+main{padding:0 16px}
+.screen{animation:in .4s cubic-bezier(.2,.8,.2,1) both}
+@keyframes in{from{opacity:0;transform:translateY(10px)}}
+h2{margin:18px 0 8px;font-size:22px}h2 small{color:var(--mu);font-size:14px;font-weight:400;margin-left:4px}
+h3{margin:18px 0 8px;font-size:13px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.06em}
+.muted{color:var(--mu)}.small{font-size:13px}p{margin:4px 0}
+.card{background:var(--s1);border:1px solid var(--ln);border-radius:18px;padding:14px 16px;margin:12px 0}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.tile{margin:0}.tile b{display:block;font-size:30px;margin-top:4px}
+.fn{display:grid;grid-template-columns:120px 1fr 44px;align-items:center;gap:10px;font-size:13px;margin:8px 0}
+.fn em{font-style:normal;color:var(--mu);text-align:right}
+.bar{height:6px;background:var(--s2);border-radius:99px;overflow:hidden;margin:8px 0}
+.bar i{display:block;height:100%;background:var(--tx);border-radius:99px;transition:width .4s}
+.fn .bar{margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:9px 14px;border-radius:99px;border:1px solid var(--ln);background:var(--s1)}
+.chip.on{background:var(--tx);color:var(--inv);border-color:var(--tx)}
+.pill{padding:4px 10px;border-radius:99px;font-size:12px;font-weight:600;white-space:nowrap}
+.pill.none{background:var(--tx);color:var(--inv)}.pill.weak{border:1px solid var(--mu)}
+.tel{color:var(--tx);text-decoration:none;font-size:14px;font-weight:400}
+.tx{white-space:pre-wrap;word-break:break-word;margin:8px 0}
+.ph{max-width:100%;max-height:240px;border-radius:12px;display:block;margin:8px 0;object-fit:cover}.ph.full{max-height:none}
+textarea{width:100%;padding:0;background:transparent;border:0;color:var(--tx);font:inherit;font-size:16px;outline:0;resize:vertical}
+.cta{width:100%;padding:15px;border:0;border-radius:16px;background:var(--tx);color:var(--inv);font-size:16px;font-weight:600}
+.cta:disabled{opacity:.35}
+.ghost{flex:1;padding:13px;border:1px solid var(--ln);background:var(--s1);border-radius:14px;display:inline-flex;justify-content:center;align-items:center;gap:8px}
+.usr{padding:10px 0;border-top:1px solid var(--ln)}.usr:first-of-type{border:0;padding-top:0}
+.empty{text-align:center;color:var(--mu);padding:60px 0}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px));background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(14px);border-top:1px solid var(--ln)}
+nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:none;color:var(--mu);font-size:11px;padding:6px 0}
+nav .on{color:var(--tx)}
+#toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom,0px));transform:translate(-50%,10px);background:var(--tx);color:var(--inv);padding:10px 16px;border-radius:99px;font-size:14px;opacity:0;pointer-events:none;transition:.3s;max-width:90%;text-align:center}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+.ed{padding:0;overflow:hidden}.tb{display:flex;gap:6px;padding:8px;border-bottom:1px solid var(--ln);overflow-x:auto}
+.tb button{min-width:38px;height:36px;border:1px solid var(--ln);background:var(--s2);border-radius:10px;padding:0 8px;flex:none}
+.lk{display:flex;gap:8px;padding:8px;border-bottom:1px solid var(--ln)}.lk[hidden]{display:none}
+.lk input{flex:1;min-width:0;background:var(--s2);border:1px solid var(--ln);border-radius:10px;padding:9px 12px;color:var(--tx);font-size:16px;outline:0}
+#ed{min-height:150px;padding:14px 16px;outline:0;font-size:16px;word-break:break-word}
+#ed:empty:before{content:attr(data-ph);color:var(--mu)}
+#ed a{color:#6ab3f3;text-decoration:underline}#ed blockquote{margin:4px 0;padding-left:10px;border-left:3px solid var(--mu)}
+#ed code{background:var(--s2);padding:1px 5px;border-radius:6px;font-family:ui-monospace,monospace}
+.sp{background:var(--s2);border-bottom:1px dashed var(--mu);padding:0 3px}.cntw{padding:0 16px 10px;margin:0}
+.th{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}.th div{position:relative;aspect-ratio:1;border-radius:12px;overflow:hidden}
+.th img{width:100%;height:100%;object-fit:cover}.th button{position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;border:0;background:rgba(0,0,0,.65);color:#fff;padding:0}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+<symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M21 20H3"/></symbol>
+<symbol id="i-img" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="m21 16-5-5-8 8"/></symbol>
+<symbol id="i-send" viewBox="0 0 24 24"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></symbol>
+<symbol id="i-ref" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7M21 4v5h-5"/></symbol>
+</svg>
+<header>
+  <div class="brand"><img class="logo" src="logo.png" alt=""><span>C&amp;C Админ</span></div>
+  <button class="icon-btn" id="rf" aria-label="Обновить"><svg class="ic"><use href="#i-ref"/></svg></button>
+</header>
+<main id="v"></main>
+<nav>
+  <button data-t="stats" class="on"><svg class="ic"><use href="#i-chart"/></svg>Статистика</button>
+  <button data-t="works"><svg class="ic"><use href="#i-img"/></svg>Работы</button>
+  <button data-t="send"><svg class="ic"><use href="#i-send"/></svg>Рассылка</button>
+</nav>
+<div id="toast"></div>
+<script>
+const tg = window.Telegram && Telegram.WebApp || null;
+if (tg) { tg.ready(); tg.expand(); document.documentElement.dataset.theme = tg.colorScheme === 'light' ? 'light' : 'dark'; }
+const $ = s => document.querySelector(s), v = $('#v');
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const NICHE = {sites: 'Сайты', bots: 'Боты', dashboards: 'Дашборды'};
+const AUD = {all: 'Все', unfinished: 'Не дошли до конца', finished: 'Дошли до конца'};
+const fmt = t => new Date(t * 1000).toLocaleString('ru-RU', {day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'});
+let tab = 'stats', aud = 'all', counts = {}, wk = 0, pt, photos = [];
+
+function toast(t) {
+  const e = $('#toast'); e.textContent = t; e.classList.add('show');
+  clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('show'), 2600);
+}
+async function api(p, o = {}) {
+  const r = await fetch(p, {...o, headers: {'X-Init-Data': tg ? tg.initData : '', ...(typeof o.body === 'string' ? {'Content-Type': 'application/json'} : {})}});
+  if (r.status === 403) throw new Error('Нет доступа. Открой панель из бота: кнопка «Панель» или команда /panel');
+  return r;
+}
+async function j(p, o) {
+  const r = await api(p, o), d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.error || 'Ошибка ' + r.status);
+  return d;
+}
+
+/* ---------- статистика ---------- */
+async function stats() {
+  const d = await j('/api/stats'), f = d.funnel, base = f.launched || 1;
+  const tiles = [['Запустили бота', f.launched], ['Сдали работу', f.submitted], ['Прошли 1 день', f.day1], ['Дошли до конца', f.finished]];
+  const rows = [['Запустили бота', f.launched], ['Прошли условия', f.marathon], ['Сдали работу', f.submitted], ['Прошли 1 день', f.day1], ['Дошли до конца', f.finished]];
+  v.innerHTML = `<div class="screen"><h2>Статистика <small>без тестов админа</small></h2>
+  <div class="grid">${tiles.map(([t, n]) => `<div class="card tile"><span class="muted small">${t}</span><b>${n}</b></div>`).join('')}</div>
+  <div class="card"><h3 style="margin-top:0">Воронка</h3>${rows.map(([t, n]) => `<div class="fn"><span>${t}</span><div class="bar"><i style="width:${Math.round(n / base * 100)}%"></i></div><em>${n}</em></div>`).join('')}</div>
+  <div class="card small muted"><p>Следующий номер в уведомлении «закончил»: <b style="color:var(--tx)">${d.next_finished}</b></p><p>Заблокировали бота: ${f.blocked}</p>
+  <p>«Прошли 1 день» = куратор принял работу. «Дошли до конца» = увидели последнее сообщение.</p></div></div>`;
+}
+
+/* ---------- работы ---------- */
+async function works() {
+  wk = 0;
+  v.innerHTML = '<div class="screen"><h2>Работы <small id="wt"></small></h2><div id="wl"></div><div class="row" style="margin:12px 0"><button class="ghost" id="more" style="display:none">Показать ещё</button></div></div>';
+  $('#more').onclick = more; await more();
+}
+async function more() {
+  const d = await j('/api/works?offset=' + wk + '&limit=15');
+  wk += d.works.length;
+  $('#wt').textContent = d.total ? 'всего ' + d.total : '';
+  if (!d.total) $('#wl').innerHTML = '<div class="empty">Пока нет работ.<br>Здесь появятся работы, присланные после обновления бота.</div>';
+  d.works.forEach(w => $('#wl').append(card(w)));
+  $('#more').style.display = d.has_more ? '' : 'none';
+}
+function card(w) {
+  const e = document.createElement('div'); e.className = 'card';
+  const nm = esc(w.name) + (w.username ? ` <a class="tel" href="https://t.me/${esc(w.username)}">@${esc(w.username)}</a>` : '');
+  e.innerHTML = `<div class="row"><b>${nm}</b><span class="pill ${w.approved ? 'none' : 'weak'}">${w.approved ? 'Принято' : 'На проверке'}</span></div>
+  <p class="muted small">${NICHE[w.niche] || 'ниша не указана'} · ${fmt(w.at)} · ID ${w.user_id}</p>
+  ${w.text ? `<p class="tx">${esc(w.text)}</p>` : ''}<div class="media"></div>`;
+  w.items.forEach(it => e.querySelector('.media').append(media(w, it)));
+  return e;
+}
+function media(w, it) {
+  const u = `/api/file/${w.id}/${it.i}`, b = document.createElement('div');
+  const blob = async () => {
+    const r = await api(u);
+    if (!r.ok) throw new Error(r.status === 413 ? 'Файл больше 20 МБ, посмотри его в чате с ботом' : 'Не удалось загрузить файл');
+    return URL.createObjectURL(await r.blob());
+  };
+  if (it.type === 'photo' || (it.mime || '').startsWith('image/')) {
+    const im = document.createElement('img'); im.className = 'ph'; b.append(im);
+    blob().then(s => im.src = s).catch(x => { b.textContent = x.message; });
+    im.onclick = () => im.classList.toggle('full');
+  } else {
+    const bt = document.createElement('button'); bt.className = 'ghost';
+    bt.textContent = ({video: '🎬 Открыть видео', audio: '🎧 Прослушать'})[it.type] || ('📎 ' + (it.name || 'Файл'));
+    bt.onclick = async () => {
+      try {
+        bt.disabled = true; const s = await blob();
+        if (it.type === 'video') { b.innerHTML = '<video controls playsinline class="ph"></video>'; b.firstChild.src = s; }
+        else if (it.type === 'audio') { b.innerHTML = '<audio controls></audio>'; b.firstChild.src = s; }
+        else { const a = document.createElement('a'); a.href = s; a.download = it.name || 'file'; a.click(); bt.disabled = false; }
+      } catch (x) { bt.disabled = false; toast(x.message); }
+    };
+    b.append(bt);
+  }
+  return b;
+}
+
+/* ---------- рассылка ---------- */
+const ed = () => $('#ed'), MAXP = 10;
+async function send() {
+  const d = await j('/api/stats'); counts = d.audiences; photos = [];
+  const chips = () => Object.keys(AUD).map(k => `<button class="chip ${k === aud ? 'on' : ''}" data-k="${k}">${AUD[k]} · ${counts[k]}</button>`).join('');
+  v.innerHTML = `<div class="screen"><h2>Рассылка <small>тем, кто запускал бота</small></h2>
+  <div class="chips" id="au">${chips()}</div>
+  <div class="card ed"><div class="tb" id="tb">
+    <button data-c="bold" title="Жирный"><b>Ж</b></button><button data-c="italic" title="Курсив"><i>К</i></button><button data-c="underline" title="Подчёркнутый"><u>Ч</u></button><button data-c="strikeThrough" title="Зачёркнутый"><s>З</s></button>
+    <button data-c="link" title="Ссылка">🔗</button><button data-c="quote" title="Цитата">❝</button><button data-c="code" title="Код">&lt;/&gt;</button><button data-c="spoiler" title="Спойлер">👁</button><button data-c="clear" title="Убрать форматирование">✕</button></div>
+  <div class="lk" id="lk" hidden><input id="lu" placeholder="Ссылка: https://…" inputmode="url"><button class="ghost" id="lo" style="flex:none;padding:9px 16px">ОК</button></div>
+  <div id="ed" contenteditable="true" data-ph="Текст рассылки. Выдели слово и нажми кнопку сверху: жирный, курсив, ссылка…"></div>
+  <p class="muted small cntw" id="cnt"></p></div>
+  <div class="card"><div class="row"><span class="muted small" id="pn"></span><button class="ghost" id="pk" style="flex:none;padding:9px 14px">Добавить фото</button></div>
+  <input type="file" id="fi" accept="image/*" multiple hidden><div class="th" id="th"></div></div>
+  <div class="row"><button class="ghost" id="tst">Тест мне</button><button class="cta" id="snd" style="flex:2">Отправить</button></div>
+  <div id="pr"></div><h3>Прошлые рассылки</h3><div id="hs"></div></div>`;
+  $('#au').onclick = e => { const k = e.target.dataset.k; if (k) { aud = k; $('#au').innerHTML = chips(); } };
+  const E = ed(); let saved = null;
+  const count = () => { const n = E.innerText.replace(/\n$/, '').length, lim = photos.length ? 1024 : 4096; $('#cnt').textContent = n + ' / ' + lim + (photos.length ? ' (подпись к фото)' : ''); $('#cnt').style.color = n > lim ? '#ff6b6b' : ''; };
+  E.oninput = () => { if (!E.innerText.trim()) E.innerHTML = ''; count(); };
+  E.onfocus = () => document.execCommand('styleWithCSS', false, false);
+  E.onpaste = e => { e.preventDefault(); document.execCommand('insertText', false, e.clipboardData.getData('text/plain')); };
+  const sel = () => { const s = getSelection(); return s.rangeCount && !s.isCollapsed && E.contains(s.getRangeAt(0).commonAncestorContainer) ? s : null; };
+  const wrap = (tag, cls) => { const s = sel(); if (!s) return toast('Сначала выдели текст'); const r = s.getRangeAt(0), n = document.createElement(tag); if (cls) n.className = cls; try { r.surroundContents(n); } catch (x) { n.appendChild(r.extractContents()); r.insertNode(n); } E.oninput(); };
+  $('#tb').addEventListener('pointerdown', e => e.preventDefault());
+  $('#tb').onclick = e => {
+    const c = e.target.closest('button')?.dataset.c; if (!c) return; E.focus();
+    if (['bold', 'italic', 'underline', 'strikeThrough'].includes(c)) document.execCommand(c);
+    else if (c === 'link') { const s = sel(); if (!s) return toast('Сначала выдели слово для ссылки'); saved = s.getRangeAt(0).cloneRange(); $('#lk').hidden = false; $('#lu').focus(); }
+    else if (c === 'quote') document.execCommand('formatBlock', false, 'blockquote');
+    else if (c === 'code') wrap('code'); else if (c === 'spoiler') wrap('span', 'sp');
+    else if (c === 'clear') { document.execCommand('removeFormat'); document.execCommand('unlink'); }
+    E.oninput();
+  };
+  $('#lo').onclick = () => {
+    let u = $('#lu').value.trim(); if (!u) return; if (!/^(https?:\/\/|tg:\/\/)/i.test(u)) u = 'https://' + u;
+    E.focus(); const s = getSelection(); s.removeAllRanges(); s.addRange(saved); document.execCommand('createLink', false, u);
+    $('#lk').hidden = true; $('#lu').value = ''; E.oninput();
+  };
+  $('#pk').onclick = () => $('#fi').click();
+  $('#fi').onchange = e => {
+    for (const f of e.target.files) { if (photos.length >= MAXP) { toast('Максимум ' + MAXP + ' фото'); break; } if (f.size > 10485760) { toast('«' + f.name + '» больше 10 МБ'); continue; } photos.push(f); }
+    e.target.value = ''; showPhotos();
+  };
+  $('#th').onclick = e => { const i = e.target.dataset.x; if (i != null) { photos.splice(+i, 1); showPhotos(); } };
+  function showPhotos() {
+    $('#th').innerHTML = photos.map((f, i) => `<div><img src="${URL.createObjectURL(f)}"><button data-x="${i}">×</button></div>`).join('');
+    $('#pn').textContent = photos.length > 1 ? photos.length + ' фото уйдут альбомом, подпись у первого' : photos.length ? '1 фото' : 'Фото (по желанию, до ' + MAXP + ')';
+    count();
+  }
+  showPhotos();
+  $('#tst').onclick = () => post(true);
+  $('#snd').onclick = () => post(false);
+  poll();
+}
+/* визуальный редактор → разметка Telegram */
+function toTg(node) {
+  let o = '';
+  node.childNodes.forEach(n => {
+    if (n.nodeType === 3) { o += esc(n.textContent); return; }
+    if (n.nodeType !== 1) return;
+    const t = n.tagName.toLowerCase(), i = toTg(n);
+    if (t === 'br') o += '\n';
+    else if (t === 'b' || t === 'strong') o += `<b>${i}</b>`;
+    else if (t === 'i' || t === 'em') o += `<i>${i}</i>`;
+    else if (t === 'u') o += `<u>${i}</u>`;
+    else if (t === 's' || t === 'strike' || t === 'del') o += `<s>${i}</s>`;
+    else if (t === 'code') o += `<code>${i}</code>`;
+    else if (t === 'blockquote') o += `<blockquote>${i.trim()}</blockquote>`;
+    else if (t === 'a') o += `<a href="${esc(n.getAttribute('href') || '')}">${i}</a>`;
+    else if (t === 'span' && n.classList.contains('sp')) o += `<tg-spoiler>${i}</tg-spoiler>`;
+    else if (t === 'div' || t === 'p') o += (o && !o.endsWith('\n') ? '\n' : '') + i;
+    else o += i;
+  });
+  return o;
+}
+async function post(test) {
+  const text = toTg(ed()).trim();
+  if (!text && !photos.length) return toast('Напиши текст или добавь фото');
+  const run = async () => {
+    try {
+      const fd = new FormData(); fd.append('text', text); fd.append('audience', aud); fd.append('test', test ? '1' : '0'); photos.forEach(f => fd.append('photo', f));
+      await j('/api/broadcast', {method: 'POST', body: fd});
+      if (test) toast('Тест пришёл тебе в чат'); else { toast('Рассылка пошла'); poll(); }
+    } catch (e) { toast(e.message); }
+  };
+  if (test) return run();
+  const q = `Отправить сообщение: ${AUD[aud].toLowerCase()} (${counts[aud]} чел.)?`;
+  if (tg && tg.showConfirm) tg.showConfirm(q, ok => ok && run()); else if (confirm(q)) run();
+}
+async function poll() {
+  clearTimeout(pt); if (tab !== 'send') return;
+  try {
+    const d = await j('/api/broadcast'), s = d.status, done = s.sent + s.failed + s.blocked;
+    $('#pr').innerHTML = s.total ? `<div class="card"><div class="row"><b>${s.running ? 'Идёт рассылка…' : 'Последняя рассылка'}</b><span class="muted small">${done}/${s.total}</span></div>
+    <div class="bar"><i style="width:${done / s.total * 100}%"></i></div><p class="muted small">Доставлено ${s.sent} · заблокировали бота ${s.blocked} · ошибок ${s.failed}</p></div>` : '';
+    $('#hs').innerHTML = d.history.length ? d.history.map(h => `<div class="usr"><div class="row"><span>${fmt(h.at)} · ${AUD[h.audience] || ''}</span><span class="muted small">${h.sent}/${h.total}</span></div><p class="muted small">${esc(h.text)}</p></div>`).join('') : '<p class="muted small">Пока пусто</p>';
+    if (s.running) pt = setTimeout(poll, 2000);
+  } catch (e) {}
+}
+
+/* ---------- навигация ---------- */
+const T = {stats, works, send};
+async function load() {
+  v.innerHTML = '<div class="empty">Загрузка…</div>';
+  try { await T[tab](); } catch (e) { v.innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
+}
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
+  tab = b.dataset.t;
+  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x === b));
+  load();
+});
+$('#rf').onclick = load;
+load();
+</script>
+</body>
+</html>
